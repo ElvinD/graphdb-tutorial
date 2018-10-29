@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, AfterContentInit } from '@angular/core';
 import { SparqlService } from '../sparql.service';
 import { Persondata } from '../persondata';
 
@@ -7,13 +7,16 @@ import { Persondata } from '../persondata';
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListComponent implements OnInit {
+export class ListComponent implements OnInit, AfterContentInit {
 
-  data: Persondata[] = [];
+  @Input() data: Persondata[] = [];
 
   constructor(private sparqlService: SparqlService) { }
 
   ngOnInit() {
+  }
+
+  ngAfterContentInit() {
     this.getRDF();
   }
 
@@ -50,6 +53,6 @@ export class ListComponent implements OnInit {
         persondata.name = name;
       this.data.push(persondata);
     }
-    // console.log('results: ', this.data);
+    console.log('results: ', this.data);
   }
 }

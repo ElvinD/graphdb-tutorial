@@ -1,3 +1,8 @@
-<p>
-  {{ data }}
-</p>
+<div *ngIf="data">
+  <ul class="list">
+    <li *ngFor="let person of data">
+     <span class="badge">{{ person.name }}</span>
+    </li>
+  </ul>
+</div>
+
