@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Persondata } from './persondata';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams  } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
