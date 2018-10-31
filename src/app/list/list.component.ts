@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, AfterContentInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { SparqlService } from '../sparql.service';
 import { Persondata } from '../persondata';
 
@@ -7,16 +7,13 @@ import { Persondata } from '../persondata';
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListComponent implements OnInit, AfterContentInit {
+export class ListComponent implements OnInit {
 
   @Input() data: Persondata[] = [];
 
   constructor(private sparqlService: SparqlService) { }
 
   ngOnInit() {
-  }
-
-  ngAfterContentInit() {
     this.getRDF();
   }
 
