@@ -4,14 +4,14 @@
   </h1>
   <div class="container">
     <div class="facets">
-      <span>Province</span>
-      <app-list (select)="onSelect($event)" class="province" template="province" [itemsChanged]="events.asObservable()"></app-list>
-      <span>Place</span>
-      <app-list (select)="onSelect($event)" class= "place" template="place" [itemsChanged]="events.asObservable()"></app-list>
+      <div><span>Province</span></div>
+      <app-list (select)="onSelect($event)" class="province" templateRole="facet" multiSelect=false template="province" [itemsChanged]="events.asObservable()"></app-list>
+      <div><span>Place</span></div>
+      <app-list (select)="onSelect($event)" class= "place" templateRole="facet" multiSelect=false template="place" [itemsChanged]="events.asObservable()"></app-list>
     </div>
     <div class="content">
-      <span>People</span>
-      <app-list (select)="onSelect($event)" class="person" template="person" [itemsChanged]="events.asObservable()"></app-list>
+        <div><span>People</span></div>
+      <app-list (select)="onSelect($event)" class="person" templateRole="content" multiSelect=false template="person" [itemsChanged]="events.asObservable()"></app-list>
     </div>
   </div>
 </div>

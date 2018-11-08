@@ -16,10 +16,14 @@ export class ListComponent implements OnInit {
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
   PREFIX imt: <http://immigrants.tutorial/>
-  PREFIX pnv: <https://w3id.org/pnv/>`;
+  PREFIX pnv: <https://w3id.org/pnv#>`;
+
+  itemsDict: {[uri: string]: ItemData} = {};
 
   @Input() items: ItemData[] = [];
   @Input() template = null;
+  @Input() templateRole = 'default';
+  @Input() multiSelect = 'true';
   @Input() itemsChanged: Observable<any>;
   @Output() select: EventEmitter<ItemData[]> = new EventEmitter();
 
@@ -30,17 +34,30 @@ export class ListComponent implements OnInit {
 
   ngOnInit() {
     if (this.template) {
-      this.getRDF();
+      window[this.template] = this;
     }
+    this.getRDF();
     if (this.itemsChanged) {
       this.itemsSubscription = this.itemsChanged.subscribe((event) => this.onSelect(event));
     }
   }
 
   onClick(item: ItemData): void {
+    if (this.multiSelect !== 'true') {
+      // console.log('resettng for ', this.template);
+      this.resetSelection(item);
+    }
     item.selected = item.selected ? false : true;
     this.emitSelection();
     // console.log('clicked: ', item);
+  }
+
+  private resetSelection(item: ItemData): void {
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i] !== item) {
+        this.items[i].selected = false;
+       }
+    }
   }
 
   private emitSelection(): void {
@@ -57,12 +74,14 @@ export class ListComponent implements OnInit {
     if (items.length) {
       if (items[0].template === this.template) {
         // console.log('This was me sending the event, ignoring: ', items[0].template);
+      } else if (items[0].templateRole === 'content') {
+        // console.log(' Or it was content doing something: ', this.templateRole);
       } else {
         // console.log('received some things: ', items);
         this.query(items);
       }
     } else {
-      console.log('received empty argument');
+      // console.log('received empty argument');
       this.getRDF();
     }
   }
@@ -106,7 +125,7 @@ export class ListComponent implements OnInit {
         ?residents dbo:residence ?place
         }
         group by ?uri ?name
-      order by desc(?hits)`;
+        order by desc(?hits)`;
       break;
 
       default:
@@ -123,6 +142,7 @@ export class ListComponent implements OnInit {
       } limit 100`;
       break;
     }
+    // console.log('Query: ', query);
     this.sparqlService.getRDF(query)
      .subscribe(data => {
         this.cleanupData();
@@ -134,6 +154,7 @@ export class ListComponent implements OnInit {
       let query: string = null;
       switch (this.template) {
         case 'person':
+        // console.log('person needs updating based on items: ', items);
           query = `
           ${ListComponent.PREFIXES}
           select ?uri ?name ?firstName ?infix ?surname ?place ?province where {
@@ -143,8 +164,9 @@ export class ListComponent implements OnInit {
             optional { ?nameURI pnv:firstName ?firstName } .
             optional { ?nameURI pnv:infix ?infix } .
             optional { ?nameURI pnv:surname ?surname } .
+            ${items.filter(item => item.template === 'place').map(item => `?uri dbo:residence <${item.uri}> .`).join(' ')}
             ?uri dbo:residence ?residence .
-            ${items.map(item => `?residence hg:liesIn <${item.uri}> .`).join(' ')}
+            ${items.filter(item => item.template === 'province').map(item => `?residence hg:liesIn <${item.uri}> .`).join(' ')}
             ?residence hg:liesIn ?province
           } limit 100`;
         break;
@@ -152,7 +174,7 @@ export class ListComponent implements OnInit {
         case 'place':
           query = `
           ${ListComponent.PREFIXES}
-          select distinct  ?uri ?name (count(?residents) as ?hits) ?province where {
+          select distinct ?uri ?name (count(?residents) as ?hits) ?province where {
 	          ?uri dct:type hg:Place ;
 	          rdfs:label ?name .
             ?residents dbo:residence ?uri .
@@ -190,7 +212,7 @@ export class ListComponent implements OnInit {
         } limit 100`;
         break;
       }
-      console.log('query is: ', query);
+      // console.log('query is: ', query);
       if (query) {
         this.sparqlService.getRDF(query)
          .subscribe(data => {
@@ -205,21 +227,21 @@ export class ListComponent implements OnInit {
         this.items[i] = null;
       }
       this.items = [];
+      this.itemsDict = {};
     }
 
     private parseResults(results: any): void {
-      console.log ('results: ', results);
+      // console.log ('results: ', results);
       let resultData: any;
       const tempDict: { [uri: string]: ItemData } = {};
       let itemdata: ItemData;
       let key: string;
       let name: string;
-      let label: string;
       let hits: number;
       for (let i = 0; i < results['results']['bindings'].length; i++ ) {
         resultData = results['results']['bindings'][i];
         key = resultData['uri'] ? resultData['uri']['value'] : null ;
-        name = label = resultData['name'] ? resultData['name']['value'] : null;
+        name = resultData['name'] ? resultData['name']['value'] : null;
         hits = resultData['hits'] ? resultData['hits']['value'] : null;
         if (null == tempDict[key]) {
           itemdata = new ItemData();
@@ -231,8 +253,18 @@ export class ListComponent implements OnInit {
         itemdata.hits = hits;
         itemdata.name = name;
         itemdata.label = name;
+        itemdata.templateRole = this.templateRole;
         itemdata.template = this.template;
-      this.items.push(itemdata);
+        if (itemdata.name && itemdata.name !== '') {
+          if (this.itemsDict[itemdata.uri] == null) {
+            this.itemsDict[itemdata.uri] = itemdata;
+            this.items.push(itemdata);
+          } else {
+            // console.log('Duplicate item found: ', itemdata);
+          }
+        } else {
+          // console.log('Item without a name found: ', itemdata);
+        }
     }
   }
 }

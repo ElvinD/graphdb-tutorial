@@ -12,7 +12,7 @@
 
   .list span {
     margin-left: 0.5em;
-    color: darkslategray;
+    color: #464646;
   }
 
   .list li {
@@ -41,12 +41,12 @@
   .list .badge {
     font-size: small;
     color: white;
-    padding: 0.5em 0.7em 0.4em 0.7em;
-    background-color: rgb(164, 111, 111);
-    position: relative;
+    padding: 0em 0.2em 0em 5em;
+    background-color:rgba(114, 116, 130, 0.52); 
+    /* position: relative;
     right: 0;
     float: right;
     top: -4px;
-    height: 1.2em;
-    border-radius: 4px;
+    height: 1.2em; */
+    border-radius: 4px; 
   }
