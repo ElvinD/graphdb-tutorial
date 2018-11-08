@@ -1,0 +1,50 @@
+.container {
+    float: left;
+    display: inline-flex;
+    width:100%;
+    max-height: 80vh;
+}
+.facets {
+    width: 20%;
+}
+.facets  span {
+    font-weight: bold;
+    color: black;
+    margin-left: 1em;
+}
+
+.content {
+    width: 80%;
+    display: inline-block;
+    overflow-x: hidden;
+}
+
+.content span {
+    font-weight: bold;
+    color: black;
+    margin-left: 1em;
+}
+
+.province {
+    width: 100%;
+    max-height: 40%;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.place {
+    width: 100%;
+    max-height: 40%;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.person {
+    width: 100%;
+    max-height: 80%;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+}

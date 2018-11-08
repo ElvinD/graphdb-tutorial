@@ -1,7 +1,10 @@
-<div *ngIf="data">
+<!-- <p>Component: {{ template }}</p> -->
+<div *ngIf="items">
   <ul class="list">
-    <li *ngFor="let person of data">
-     <span class="badge">{{ person.name }}</span>
+    <li *ngFor="let item of items" [class.selected]="item.selected === true">
+     <span 
+     (click)="onClick(item);">{{ item.label }}</span>
+     <span *ngIf="item.hits" class="badge">{{ item.hits }}</span>
     </li>
   </ul>
 </div>

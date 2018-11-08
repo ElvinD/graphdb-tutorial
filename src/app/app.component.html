@@ -1,7 +1,17 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
+<div style="text-align:left">
   <h1>
     Welcome to {{ title }}
   </h1>
-  <app-list></app-list>
+  <div class="container">
+    <div class="facets">
+      <span>Province</span>
+      <app-list (select)="onSelect($event)" class="province" template="province" [itemsChanged]="events.asObservable()"></app-list>
+      <span>Place</span>
+      <app-list (select)="onSelect($event)" class= "place" template="place" [itemsChanged]="events.asObservable()"></app-list>
+    </div>
+    <div class="content">
+      <span>People</span>
+      <app-list (select)="onSelect($event)" class="person" template="person" [itemsChanged]="events.asObservable()"></app-list>
+    </div>
+  </div>
 </div>
