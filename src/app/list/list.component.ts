@@ -24,21 +24,21 @@ export class ListComponent implements OnInit {
   @Input() template = null;
   @Input() templateRole = 'default';
   @Input() multiSelect = 'true';
-  @Input() itemsChanged: Observable<any>;
+  @Input() dataChanged: Observable<any>;
   @Output() select: EventEmitter<ItemData[]> = new EventEmitter();
 
   itemsSubscription: any;
 
   constructor(
-    private sparqlService: SparqlService) { }
+    protected sparqlService: SparqlService) { }
 
   ngOnInit() {
     if (this.template) {
       window[this.template] = this;
     }
     this.getRDF();
-    if (this.itemsChanged) {
-      this.itemsSubscription = this.itemsChanged.subscribe((event) => this.onSelect(event));
+    if (this.dataChanged) {
+      this.itemsSubscription = this.dataChanged.subscribe((event) => this.onSelect(event));
     }
   }
 

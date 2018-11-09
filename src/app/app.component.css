@@ -2,21 +2,23 @@
     float: left;
     display: inline-flex;
     width:100%;
-    max-height: 80vh;
+    max-height: 50vh;
 }
 .facets {
-    width: 18%;
+    width: 20%;
+    font-size: small;
+    font-weight: bold;
 }
-.facets  span {
+
+/* .facets span {
     font-weight: bold;
     color: black;
     margin-left: 1em;
-}
+} */
 
 .content {
-    width: 80%;
-    display: inline-block;
-    overflow-x: hidden;
+    display: inline-flex;
+    width: 50%;
 }
 
 .content span {
@@ -25,7 +27,8 @@
     margin-left: 1em;
 }
 
-.province {
+
+/* .province {
     width: 100%;
     max-height: 40%;
     display: inline-block;
@@ -44,10 +47,22 @@
     font-weight: bold;
     font-size: small;
 }
-
-.person {
+*/
+.list {
     width: 50%;
-    max-height: 80%;
+    height: 200%;
+} 
+
+.detail {
+    width: 50%;
+    max-height: 50%;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.map {
+    width: 50%;
+    max-height: 50%;
     display: inline-block;
     overflow-x: hidden;
     overflow-y: auto;

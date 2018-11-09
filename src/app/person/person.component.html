@@ -1,0 +1,18 @@
+<div *ngIf="person&&person.hasName">
+  <div *ngIf="person.hasName.literalName"><span>Volledige naam: </span>{{person.hasName.literalName}}</div>
+  <div *ngIf="person.hasName.infixTitle"><span>Adellijke titel: </span>{{person.hasName.infixTitle}}</div>
+  <div *ngIf="person.hasName.prefix"><span>Voorvoegsel: </span>{{person.hasName.prefix}}</div>
+  <div *ngIf="person.hasName.givenNameSuffix"><span>Toevoegsel voornaam: </span>{{person.hasName.givenNameSuffix}}</div>
+  <div *ngIf="person.hasName.givenName"><span>Eén of meer voornamen: </span>{{person.hasName.givenName}}</div>
+  <div *ngIf="person.hasName.firstName"><span>Voornaam: </span>{{person.hasName.firstName}}</div>
+  <div *ngIf="person.hasName.infix"><span>Tussenvoegsel: </span>{{person.hasName.infix}}</div>
+  <div *ngIf="person.hasName.baseSurname"><span>Basis achternaam: </span>{{person.hasName.baseSurname}}</div>
+  <div *ngIf="person.hasName.surnamePrefix"><span>Familienaam prefix: </span>{{person.hasName.surnamePrefix}}</div>
+  <div *ngIf="person.hasName.surname"><span>Familienaam: </span>{{person.hasName.surname}}</div>
+  <div *ngIf="person.hasName.patronym"><span>Patroniem: </span>{{person.hasName.patronym}}</div>
+  <div *ngIf="person.hasName.trailingPatronym"><span>Patroniem na achternaam: </span>{{person.hasName.trailingPatronym}}</div>
+  <div *ngIf="person.hasName.suffix"><span>Achtervoegsel: </span>{{person.hasName.suffix}}</div>
+  <div *ngIf="person.hasName.disambiguatingDescription"><span>Achtervoegsel (onderscheidend): </span>{{person.hasName.disambiguatingDescription}}</div>
+  <div *ngIf="person.hasName.honorificSuffix"><span>Titel (adellijk of burgerlijk) als achtervoegsel: </span>{{person.hasName.honorificSuffix}}</div>
+  <div *ngIf="person.uri"><span>URI: </span>{{person.uri}}</div>
+</div>

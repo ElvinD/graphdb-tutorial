@@ -3,16 +3,35 @@
     background-color: #BBD8DC !important;
     color: white;
   }
-  .list {
+  .list ul {
     margin: 0 0 2em 0;
     list-style-type: none;
     padding: 0;
     text-align: left;
   }
 
+  .title {
+    font-weight: bold;
+    color: black;
+    margin-left: 1em;
+  }
+
+  .list {
+    max-height: 80%;
+    width: 100%;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    vertical-align: top;
+  }
+
   .list span {
     margin-left: 0.5em;
     color: #464646;
+  }
+
+  span {
+    margin-left: 0.5em;
   }
 
   .list li {
