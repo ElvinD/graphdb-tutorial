@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import { Component, OnInit, AfterContentInit, Input, Output, EventEmitter } from '@angular/core';
 import { SparqlService } from '../sparql.service';
 import { ItemData } from '../itemdata';
 import { Observable } from 'rxjs';
@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListComponent implements OnInit {
+export class ListComponent implements OnInit, AfterContentInit {
 
   static PREFIXES = `
   PREFIX hg: <https://rdf.histograph.io/>
@@ -18,7 +18,7 @@ export class ListComponent implements OnInit {
   PREFIX imt: <http://immigrants.tutorial/>
   PREFIX pnv: <https://w3id.org/pnv#>`;
 
-  itemsDict: {[uri: string]: ItemData} = {};
+  itemsDict: { [uri: string]: ItemData } = {};
 
   @Input() items: ItemData[] = [];
   @Input() template = null;
@@ -33,13 +33,21 @@ export class ListComponent implements OnInit {
     protected sparqlService: SparqlService) { }
 
   ngOnInit() {
-    if (this.template) {
-      window[this.template] = this;
-    }
+    // if (this.template) {
+    //   window[this.template] = this;
+    // }
     this.getRDF();
     if (this.dataChanged) {
-      this.itemsSubscription = this.dataChanged.subscribe((event) => this.onSelect(event));
+      this.subscribeToEvents();
     }
+  }
+
+  protected subscribeToEvents() {
+    this.itemsSubscription = this.dataChanged.subscribe((event) => this.onSelect(event));
+  }
+
+  ngAfterContentInit() {
+    // console.log('ngAfterContentInit() for ', this.items);
   }
 
   onClick(item: ItemData): void {
@@ -52,11 +60,19 @@ export class ListComponent implements OnInit {
     // console.log('clicked: ', item);
   }
 
+  protected setDefaultSelection(): void {
+    if (this.items && this.items.length) {
+      const item = this.items[0];
+      item.selected = true;
+      this.emitSelection();
+    }
+  }
+
   private resetSelection(item: ItemData): void {
     for (let i = 0; i < this.items.length; i++) {
       if (this.items[i] !== item) {
         this.items[i].selected = false;
-       }
+      }
     }
   }
 
@@ -86,7 +102,7 @@ export class ListComponent implements OnInit {
     }
   }
 
-  private getRDF(): void {
+  protected getRDF(): void {
     let query: string;
     switch (this.template) {
       case 'person':
@@ -101,7 +117,7 @@ export class ListComponent implements OnInit {
           optional { ?nameURI pnv:infix ?infix } .
           optional { ?nameURI pnv:surname ?surname } .
         } limit 100`;
-      break;
+        break;
 
       case 'place':
         query = `
@@ -113,10 +129,10 @@ export class ListComponent implements OnInit {
           }
           group by ?uri ?name
           order by desc(?hits)`;
-      break;
+        break;
 
       case 'province':
-      query = `
+        query = `
         ${ListComponent.PREFIXES}
         select ?uri ?name (count(?residents) as ?hits) where {
 	      ?uri dct:type hg:Province ;
@@ -126,10 +142,10 @@ export class ListComponent implements OnInit {
         }
         group by ?uri ?name
         order by desc(?hits)`;
-      break;
+        break;
 
       default:
-      query = `
+        query = `
       ${ListComponent.PREFIXES}
       select ?uri ?name ?firstName ?infix ?surname ?residence where {
         ?uri a pnv:Person ;
@@ -140,22 +156,25 @@ export class ListComponent implements OnInit {
         optional { ?nameURI pnv:infix ?infix } .
         optional { ?nameURI pnv:surname ?surname } .
       } limit 100`;
-      break;
+        break;
     }
     // console.log('Query: ', query);
     this.sparqlService.getRDF(query)
-     .subscribe(data => {
+      .subscribe(data => {
         this.cleanupData();
         this.parseResults(data);
+        if (this.template === 'person') {
+          this.setDefaultSelection();
+        }
       });
-    }
+  }
 
-    private query(items: ItemData[]): void {
-      let query: string = null;
-      switch (this.template) {
-        case 'person':
+  protected query(items: ItemData[]): void {
+    let query: string = null;
+    switch (this.template) {
+      case 'person':
         // console.log('person needs updating based on items: ', items);
-          query = `
+        query = `
           ${ListComponent.PREFIXES}
           select ?uri ?name ?firstName ?infix ?surname ?place ?province where {
             ?uri a pnv:Person ;
@@ -171,8 +190,8 @@ export class ListComponent implements OnInit {
           } limit 100`;
         break;
 
-        case 'place':
-          query = `
+      case 'place':
+        query = `
           ${ListComponent.PREFIXES}
           select distinct ?uri ?name (count(?residents) as ?hits) ?province where {
 	          ?uri dct:type hg:Place ;
@@ -185,7 +204,7 @@ export class ListComponent implements OnInit {
           order by desc(?hits)`;
         break;
 
-        case 'province':
+      case 'province':
         query = `
           ${ListComponent.PREFIXES}
           select ?uri ?name (count(?residents) as ?hits) where {
@@ -198,7 +217,7 @@ export class ListComponent implements OnInit {
         order by desc(?hits)`;
         break;
 
-        default:
+      default:
         query = `
         ${ListComponent.PREFIXES}
         select ?uri ?name ?firstName ?infix ?surname ?residence where {
@@ -211,60 +230,63 @@ export class ListComponent implements OnInit {
           optional { ?nameURI pnv:surname ?surname } .
         } limit 100`;
         break;
-      }
-      // console.log('query is: ', query);
-      if (query) {
-        this.sparqlService.getRDF(query)
-         .subscribe(data => {
-           this.cleanupData();
-           this.parseResults(data);
-          });
-      }
     }
-
-    private cleanupData(): void {
-      for (let i = 0; i < this.items.length; i++) {
-        this.items[i] = null;
-      }
-      this.items = [];
-      this.itemsDict = {};
-    }
-
-    private parseResults(results: any): void {
-      // console.log ('results: ', results);
-      let resultData: any;
-      const tempDict: { [uri: string]: ItemData } = {};
-      let itemdata: ItemData;
-      let key: string;
-      let name: string;
-      let hits: number;
-      for (let i = 0; i < results['results']['bindings'].length; i++ ) {
-        resultData = results['results']['bindings'][i];
-        key = resultData['uri'] ? resultData['uri']['value'] : null ;
-        name = resultData['name'] ? resultData['name']['value'] : null;
-        hits = resultData['hits'] ? resultData['hits']['value'] : null;
-        if (null == tempDict[key]) {
-          itemdata = new ItemData();
-          tempDict[key] = itemdata;
-        } else {
-          itemdata = tempDict[key];
-        }
-        itemdata.uri = key;
-        itemdata.hits = hits;
-        itemdata.name = name;
-        itemdata.label = name;
-        itemdata.templateRole = this.templateRole;
-        itemdata.template = this.template;
-        if (itemdata.name && itemdata.name !== '') {
-          if (this.itemsDict[itemdata.uri] == null) {
-            this.itemsDict[itemdata.uri] = itemdata;
-            this.items.push(itemdata);
-          } else {
-            // console.log('Duplicate item found: ', itemdata);
+    // console.log('query is: ', query);
+    if (query) {
+      this.sparqlService.getRDF(query)
+        .subscribe(data => {
+          this.cleanupData();
+          this.parseResults(data);
+          if (this.template === 'person') {
+            this.setDefaultSelection();
           }
+        });
+    }
+  }
+
+  protected cleanupData(): void {
+    for (let i = 0; i < this.items.length; i++) {
+      this.items[i] = null;
+    }
+    this.items = [];
+    this.itemsDict = {};
+  }
+
+  protected parseResults(results: any): void {
+    // console.log ('results: ', results);
+    let resultData: any;
+    const tempDict: { [uri: string]: ItemData } = {};
+    let itemdata: ItemData;
+    let key: string;
+    let name: string;
+    let hits: number;
+    for (let i = 0; i < results['results']['bindings'].length; i++) {
+      resultData = results['results']['bindings'][i];
+      key = resultData['uri'] ? resultData['uri']['value'] : null;
+      name = resultData['name'] ? resultData['name']['value'] : null;
+      hits = resultData['hits'] ? resultData['hits']['value'] : null;
+      if (null == tempDict[key]) {
+        itemdata = new ItemData();
+        tempDict[key] = itemdata;
+      } else {
+        itemdata = tempDict[key];
+      }
+      itemdata.uri = key;
+      itemdata.hits = hits;
+      itemdata.name = name;
+      itemdata.label = name;
+      itemdata.templateRole = this.templateRole;
+      itemdata.template = this.template;
+      if (itemdata.name && itemdata.name !== '') {
+        if (this.itemsDict[itemdata.uri] == null) {
+          this.itemsDict[itemdata.uri] = itemdata;
+          this.items.push(itemdata);
         } else {
-          // console.log('Item without a name found: ', itemdata);
+          // console.log('Duplicate item found: ', itemdata);
         }
+      } else {
+        // console.log('Item without a name found: ', itemdata);
+      }
     }
   }
 }

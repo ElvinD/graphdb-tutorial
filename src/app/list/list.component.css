@@ -1,6 +1,6 @@
 /* listComponent's private CSS styles */
 .selected {
-    background-color: #BBD8DC !important;
+    background-color: darkorange !important;
     color: white;
   }
   .list ul {
@@ -44,8 +44,13 @@
     border-radius: 4px;
     background-color: lightgrey;
   }
+
+  .list li.selected span {
+    color:white;
+    font-weight: bold;
+  }
   .list li.selected:hover {
-    background-color: #BBD8DC !important;
+    background-color: darkorange !important;
     color: white;
   }
   .list li:hover {

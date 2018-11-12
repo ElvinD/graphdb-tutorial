@@ -1,0 +1,9 @@
+.mapcontent {
+    max-height: 80%;
+    width: 100%;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    vertical-align: top;
+    margin: 1em;
+}
