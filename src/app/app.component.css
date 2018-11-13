@@ -31,8 +31,10 @@
 .detail {
     font-weight: bold;
     font-size: small;
+    width:50%;
 }
 
-.list {
+.listcontainer {
     height: 200%;
+    width: 100%;
 } 

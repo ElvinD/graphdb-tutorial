@@ -10,7 +10,7 @@
         [dataChanged]="events.asObservable()"></app-list>
     </div>
     <div class="content">
-      <div class="list">
+      <div class="listcontainer">
         <app-list (select)="onSelect($event)" class="person" templateRole="content" multiSelect=false template="person"
           [dataChanged]="events.asObservable()"></app-list>
       </div>

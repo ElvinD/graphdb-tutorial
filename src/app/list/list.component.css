@@ -16,6 +16,10 @@
     margin-left: 1em;
   }
 
+  .person  {
+    width:100%;
+  }
+
   .list {
     max-height: 80%;
     width: 100%;
