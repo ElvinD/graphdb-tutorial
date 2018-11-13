@@ -29,15 +29,10 @@
 
 
 .detail {
-    width: 100%;
-    display: inline-block;
-    overflow-x: hidden;
-    overflow-y: auto;
     font-weight: bold;
     font-size: small;
 }
 
 .list {
-    width: 50%;
     height: 200%;
 } 
