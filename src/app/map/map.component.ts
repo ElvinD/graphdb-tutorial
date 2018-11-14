@@ -30,7 +30,7 @@ export class MapComponent extends ListComponent implements OnInit, AfterViewInit
     layers: [
       this.maps
     ],
-    zoom: 10,
+    zoom: 8,
     preferCanvas: true,
     center: latLng([52.08095165, 5.12768031549829])
   };
@@ -50,19 +50,22 @@ export class MapComponent extends ListComponent implements OnInit, AfterViewInit
   }
 
   search(query: string) {
-    console.log('search query: ', query);
+    // console.log('search query: ', query);
     this.searchService.search(query).subscribe(data => {
       if (data.length) {
         const coords = data[0];
         if (coords['lat'] && coords['lon']) {
           const lat: number = coords['lat'];
           const lon: number = coords['lon'];
-          console.log('retreived cords: ', lon , lat);
-          this.map.panTo([lat, lon], {animate: true, duration: 1});
+          // console.log('retreived cords: ', lon , lat);
+          let zoom = 10;
+          if (this.place) {
+            zoom = 12;
+          }
+          // this.map.panTo([lat, lon], {animate: true, duration: 1});
+          this.map.flyTo([lat, lon], zoom, {animate: true, duration: 2});
         }
-
       }
-      // this.map.panTo(data);
     });
   }
 
@@ -75,11 +78,11 @@ export class MapComponent extends ListComponent implements OnInit, AfterViewInit
 	      ?uri dct:type hg:Province ;
         rdfs:label ?name .
         <${placeURI}> hg:liesIn ?uri .
-}`;
+      }`;
   }
 
   protected query(items: ItemData[]): void {
-    console.log('map received items: ', items);
+    // console.log('map received items: ', items);
     let query: string = null;
     if (items.length) {
       switch (items[0].template) {
@@ -113,6 +116,7 @@ export class MapComponent extends ListComponent implements OnInit, AfterViewInit
   }
 
   ngOnInit() {
+    // only for debugging!
     if (this.template) {
       window[this.template] = this;
     }
