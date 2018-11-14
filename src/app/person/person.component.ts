@@ -96,7 +96,7 @@ export class PersonComponent extends ListComponent implements OnInit {
   }
 
   protected parseResults(results: any): void {
-    console.log('person results: ', results);
+    // console.log('person results: ', results);
     let resultData: any;
     const tempDict: { [uri: string]: Person } = {};
     let person: Person;

@@ -169,6 +169,34 @@ export class ListComponent implements OnInit, AfterContentInit {
       });
   }
 
+  protected getPlaceQuery(items: ItemData[]): string {
+    return `
+    ${ListComponent.PREFIXES}
+    select distinct ?uri ?name (count(?residents) as ?hits) ?province where {
+      ?uri dct:type hg:Place ;
+      rdfs:label ?name .
+      ?residents dbo:residence ?uri .
+      ${items.map(item => `?uri hg:liesIn <${item.uri}> .`).join(' ')}
+      ?uri hg:liesIn ?province
+    }
+    group by ?uri ?name ?province
+    order by desc(?hits)`;
+  }
+
+  protected getProvinceQuery(items: ItemData[]): string {
+    return `
+    ${ListComponent.PREFIXES}
+    select ?uri ?name (count(?residents) as ?hits) where {
+    ?uri dct:type hg:Province ;
+    rdfs:label ?name .
+    ?place hg:liesIn ?uri .
+    ?residents dbo:residence ?place
+    }
+    group by ?uri ?name
+  order by desc(?hits)`;
+  }
+
+
   protected query(items: ItemData[]): void {
     let query: string = null;
     switch (this.template) {
@@ -191,30 +219,11 @@ export class ListComponent implements OnInit, AfterContentInit {
         break;
 
       case 'place':
-        query = `
-          ${ListComponent.PREFIXES}
-          select distinct ?uri ?name (count(?residents) as ?hits) ?province where {
-	          ?uri dct:type hg:Place ;
-	          rdfs:label ?name .
-            ?residents dbo:residence ?uri .
-            ${items.map(item => `?uri hg:liesIn <${item.uri}> .`).join(' ')}
-            ?uri hg:liesIn ?province
-          }
-          group by ?uri ?name ?province
-          order by desc(?hits)`;
+        query = this.getPlaceQuery(items);
         break;
 
       case 'province':
-        query = `
-          ${ListComponent.PREFIXES}
-          select ?uri ?name (count(?residents) as ?hits) where {
-          ?uri dct:type hg:Province ;
-          rdfs:label ?name .
-          ?place hg:liesIn ?uri .
-          ?residents dbo:residence ?place
-          }
-          group by ?uri ?name
-        order by desc(?hits)`;
+        query = this.getProvinceQuery(items);
         break;
 
       default:
