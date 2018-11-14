@@ -149,14 +149,33 @@ export class ListComponent implements OnInit, AfterContentInit {
         break;
     }
     // console.log('Query: ', query);
-    this.sparqlService.getRDF(query)
-      .subscribe(data => {
-        this.cleanupData();
-        this.parseResults(data);
-        if (this.template === 'province') {
-          this.setDefaultSelection();
-        }
-      });
+    if (query) {
+      this.sparqlService.getRDF(query)
+        .subscribe(data => {
+          this.cleanupData();
+          this.parseResults(data);
+          if (this.template === 'province') {
+            this.setDefaultSelection();
+          }
+        });
+    }
+  }
+
+  protected getPersonsQuery(items: ItemData[]): string {
+    return `
+    ${ListComponent.PREFIXES}
+    select ?uri ?name ?firstName ?infix ?surname ?place ?province where {
+      ?uri a pnv:Person ;
+      pnv:hasName ?nameURI .
+      optional { ?nameURI pnv:literalName ?name } .
+      optional { ?nameURI pnv:firstName ?firstName } .
+      optional { ?nameURI pnv:infix ?infix } .
+      optional { ?nameURI pnv:surname ?surname } .
+      ${items.filter(item => item.template === 'place').map(item => `?uri dbo:residence <${item.uri}> .`).join(' ')}
+      ?uri dbo:residence ?residence .
+      ${items.filter(item => item.template === 'province').map(item => `?residence hg:liesIn <${item.uri}> .`).join(' ')}
+      ?residence hg:liesIn ?province
+    } limit 100`;
   }
 
   protected getPlaceQuery(items: ItemData[]): string {
@@ -183,7 +202,7 @@ export class ListComponent implements OnInit, AfterContentInit {
     ?residents dbo:residence ?place
     }
     group by ?uri ?name
-  order by desc(?hits)`;
+    order by desc(?hits)`;
   }
 
 
@@ -192,20 +211,7 @@ export class ListComponent implements OnInit, AfterContentInit {
     switch (this.template) {
       case 'person':
         // console.log('person needs updating based on items: ', items);
-        query = `
-          ${ListComponent.PREFIXES}
-          select ?uri ?name ?firstName ?infix ?surname ?place ?province where {
-            ?uri a pnv:Person ;
-            pnv:hasName ?nameURI .
-            optional { ?nameURI pnv:literalName ?name } .
-            optional { ?nameURI pnv:firstName ?firstName } .
-            optional { ?nameURI pnv:infix ?infix } .
-            optional { ?nameURI pnv:surname ?surname } .
-            ${items.filter(item => item.template === 'place').map(item => `?uri dbo:residence <${item.uri}> .`).join(' ')}
-            ?uri dbo:residence ?residence .
-            ${items.filter(item => item.template === 'province').map(item => `?residence hg:liesIn <${item.uri}> .`).join(' ')}
-            ?residence hg:liesIn ?province
-          } limit 100`;
+        query = this.getPersonsQuery(items);
         break;
 
       case 'place':
@@ -213,7 +219,8 @@ export class ListComponent implements OnInit, AfterContentInit {
         break;
 
       case 'province':
-        query = this.getProvinceQuery(items);
+        // query = this.getProvinceQuery(items);
+        return;
         break;
 
       default:
