@@ -105,7 +105,8 @@ export class ListComponent implements OnInit, AfterContentInit {
   protected getRDF(): void {
     let query: string;
     switch (this.template) {
-      case 'person':
+      // NOT USED
+      case '-person':
         query = `
         ${ListComponent.PREFIXES}
         select ?uri ?name ?firstName ?infix ?surname ?place where {
@@ -118,8 +119,8 @@ export class ListComponent implements OnInit, AfterContentInit {
           optional { ?nameURI pnv:surname ?surname } .
         } limit 100`;
         break;
-
-      case 'place':
+      // NOT USED
+      case '-place':
         query = `
         ${ListComponent.PREFIXES}
           select ?uri ?name (count(?residents) as ?hits) where {
@@ -145,17 +146,6 @@ export class ListComponent implements OnInit, AfterContentInit {
         break;
 
       default:
-        query = `
-      ${ListComponent.PREFIXES}
-      select ?uri ?name ?firstName ?infix ?surname ?residence where {
-        ?uri a pnv:Person ;
-        dbo:residence ?residence ;
-        pnv:hasName ?nameURI .
-        optional { ?nameURI pnv:literalName ?name } .
-        optional { ?nameURI pnv:firstName ?firstName } .
-        optional { ?nameURI pnv:infix ?infix } .
-        optional { ?nameURI pnv:surname ?surname } .
-      } limit 100`;
         break;
     }
     // console.log('Query: ', query);
@@ -163,7 +153,7 @@ export class ListComponent implements OnInit, AfterContentInit {
       .subscribe(data => {
         this.cleanupData();
         this.parseResults(data);
-        if (this.template === 'person') {
+        if (this.template === 'province') {
           this.setDefaultSelection();
         }
       });
