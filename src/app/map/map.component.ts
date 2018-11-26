@@ -71,7 +71,7 @@ export class MapComponent extends ListComponent implements OnInit, AfterViewInit
 
   getFindProvinceByPlaceQuery(placeURI: string): string {
     return `
-      PREFIX hg: <https://rdf.histograph.io/>
+      PREFIX hg: <http://rdf.histograph.io/>
       PREFIX dct: <http://purl.org/dc/terms/>
       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
       select ?uri ?name ?province where {
@@ -130,7 +130,7 @@ export class MapComponent extends ListComponent implements OnInit, AfterViewInit
   }
 
   protected parseResults(results: any): void {
-    // console.log ('results: ', results);
+    console.log ('results: ', results);
     let resultData: any;
     let key: string;
     let name: string;
@@ -140,7 +140,7 @@ export class MapComponent extends ListComponent implements OnInit, AfterViewInit
       name = resultData['name'] ? resultData['name']['value'] : null;
       if (name && this.province === null) {
         this.province = name;
-        // console.log('we now have a place and province ', this.place, this.province);
+        console.log('we now have a place and province ', this.place, this.province);
         return;
       }
     }

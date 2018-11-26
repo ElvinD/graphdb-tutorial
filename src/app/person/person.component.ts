@@ -2,7 +2,6 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { SparqlService } from '../sparql.service';
 import { ListComponent } from '../list/list.component';
 import { ItemData } from '../itemdata';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-person',

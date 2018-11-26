@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 export class ListComponent implements OnInit, AfterContentInit {
 
   static PREFIXES = `
-  PREFIX hg: <https://rdf.histograph.io/>
+  PREFIX hg: <http://rdf.histograph.io/>
   PREFIX dct: <http://purl.org/dc/terms/>
   PREFIX dbo: <http://dbpedia.org/ontology/>
   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
